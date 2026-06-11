@@ -1,24 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #292929;
-  --bg-elevated: #333333;
-  --surface: #363636;
-  --surface-alt: #3e3e3e;
-  --surface-hover: rgba(255,255,255,0.07);
+  --bg: #191919;
+  --bg-elevated: #1e1e1e;
+  --surface: #252525;
+  --surface-alt: #2a2a2a;
+  --surface-hover: rgba(255,255,255,0.06);
   --border: rgba(255,255,255,0.08);
-  --border-light: rgba(255,255,255,0.05);
-  --text: #e8e8e8;
-  --text-secondary: #a8a8a8;
-  --text-muted: #6e6e6e;
-  --accent: #c96442;
-  --accent-dim: #b8563a;
-  --accent-surface: rgba(201,100,66,0.12);
+  --border-light: rgba(255,255,255,0.04);
+  --text: #f0f0f0;
+  --text-secondary: #b0b0b0;
+  --text-muted: #707070;
+  --accent: #3c7bc0;
+  --accent-dim: #3570b0;
+  --accent-surface: rgba(60,123,192,0.12);
   --success: #5cb85c;
   --warning: #e8a838;
   --error: #d9534f;
-  --icon: #9a9a9a;
-  --icon-hover: #d0d0d0;
+  --icon: #8a8a8a;
+  --icon-hover: #d8d8d8;
+  --sidebar-bg: #171717;
+  --sidebar-hover: #121212;
 }
 
 [data-theme="light"] {
@@ -32,27 +34,33 @@
   --text: #1a1a1a;
   --text-secondary: #666666;
   --text-muted: #999999;
-  --accent: #c96442;
-  --accent-dim: #b8563a;
-  --accent-surface: rgba(201,100,66,0.08);
+  --accent: #3c7bc0;
+  --accent-dim: #3570b0;
+  --accent-surface: rgba(60,123,192,0.08);
   --success: #5cb85c;
   --warning: #e8a838;
   --error: #d9534f;
   --icon: #777777;
   --icon-hover: #333333;
+  --sidebar-bg: #f5f5f5;
+  --sidebar-hover: #e8e8e8;
 }
 
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-libre), Georgia, "Times New Roman", serif;
 }
 
 * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
@@ -88,8 +96,8 @@ body {
   50% { opacity: 0.4; }
 }
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 6px rgba(201,100,66,0.15); }
-  50% { box-shadow: 0 0 12px rgba(201,100,66,0.25); }
+  0%, 100% { box-shadow: 0 0 6px rgba(60,123,192,0.15); }
+  50% { box-shadow: 0 0 12px rgba(60,123,192,0.25); }
 }
 @keyframes sidebarOpen {
   from { width: 48px; }
@@ -109,6 +117,12 @@ body {
 .typing-dot { animation: typing-dot 1.4s ease-in-out infinite; }
 .typing-dot:nth-child(2) { animation-delay: 0.2s; }
 .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes spotlightIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-spotlight { animation: spotlightIn 0.2s cubic-bezier(0.16,1,0.3,1) forwards; }
 
 .sidebar-animate {
   transition: width 0.2s cubic-bezier(0.4,0,0.2,1);
