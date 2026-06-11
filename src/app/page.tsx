@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import LoginScreen from "@/components/LoginScreen";
 import Sidebar from "@/components/Sidebar";
 import ContextBar from "@/components/ContextBar";
@@ -10,7 +10,7 @@ import SessionPicker from "@/components/SessionPicker";
 import ArtifactViewer from "@/components/ArtifactViewer";
 import {
   mockSessions, mockToolSessions, mockToolCalls, mockMessages, mockMemoryDocs,
-  type Message, type BridgeHealth, type Artifact, type MemoryDoc,
+  type Message, type BridgeHealth, type Artifact,
 } from "@/data/mock";
 
 export default function Home() {
@@ -24,9 +24,15 @@ export default function Home() {
   const [activeArtifact, setActiveArtifact] = useState<Artifact | null>(null);
   const [queuedMessages, setQueuedMessages] = useState<string[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [memoryDocs, setMemoryDocs] = useState<MemoryDoc[]>(mockMemoryDocs);
+  const [darkMode, setDarkMode] = useState(true);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
   const attachedSession = mockToolSessions.find((s) => s.attached);
+
+  const artifacts = messages.filter((m) => m.artifact).map((m) => m.artifact!);
 
   const handleSendMessage = useCallback((content: string) => {
     if (isStreaming) { setQueuedMessages((p) => [...p, content]); return; }
@@ -39,9 +45,8 @@ export default function Home() {
     setTimeout(() => {
       setMessages((p) => [...p, {
         id: `m${Date.now() + 1}`, role: "assistant",
-        content: "Analyzing your request. The routing layer determined this should use the knowledge base for a static lookup.",
+        content: "Analyzing your request. I'll pull the relevant data and get back to you.",
         timestamp: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false }),
-        route: "knowledge",
       }]);
       setIsStreaming(false);
     }, 2000);
@@ -59,14 +64,9 @@ export default function Home() {
         id: `m${Date.now()}`, role: "assistant",
         content: "Reprocessing with updated context...",
         timestamp: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false }),
-        route: "knowledge",
       }]);
       setIsStreaming(false);
     }, 1500);
-  }, []);
-
-  const handleToggleMemory = useCallback((id: string) => {
-    setMemoryDocs((prev) => prev.map((d) => d.id === id ? { ...d, active: !d.active } : d));
   }, []);
 
   if (!username) return <LoginScreen onLogin={setUsername} />;
@@ -77,7 +77,8 @@ export default function Home() {
         sessions={mockSessions} activeSessionId={activeSessionId}
         onSelectSession={setActiveSessionId} collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        username={username}
+        username={username} darkMode={darkMode}
+        onToggleDarkMode={() => setDarkMode(!darkMode)}
       />
 
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
@@ -96,7 +97,7 @@ export default function Home() {
             onOpenArtifact={setActiveArtifact}
           />
           {rightPanelOpen && (
-            <RightPanel memoryDocs={memoryDocs} toolCalls={mockToolCalls} onToggleMemory={handleToggleMemory} />
+            <RightPanel memoryDocs={mockMemoryDocs} toolCalls={mockToolCalls} artifacts={artifacts} />
           )}
         </div>
       </div>

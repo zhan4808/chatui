@@ -1,6 +1,5 @@
-export type RouteSource = "knowledge" | "log-analysis" | "live-fc";
-export type BridgeHealth = "connected" | "degraded" | "disconnected" | "not-attached";
 export type ToolType = "fc" | "sdc" | "redhawk" | "star-rc" | "icv" | "pt" | "dc";
+export type BridgeHealth = "connected" | "degraded" | "disconnected" | "not-attached";
 
 export type ToolSession = {
   id: string;
@@ -22,7 +21,6 @@ export type ToolCall = {
   input: string;
   output: string;
   duration: string;
-  route: RouteSource;
 };
 
 export type Artifact = {
@@ -37,7 +35,6 @@ export type Message = {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
-  route?: RouteSource;
   fcCommand?: { command: string; output: string; duration: string };
   artifact?: Artifact;
   citations?: string[];
@@ -51,16 +48,14 @@ export type MemoryDoc = {
   type: "methodology" | "run-context" | "user-pref" | "project";
   summary: string;
   lastUsed: string;
-  active: boolean;
 };
 
 export type ChatSession = {
   id: string;
   title: string;
   timestamp: string;
-  runArea?: string;
-  activeTool?: ToolType;
   messageCount: number;
+  pinned?: boolean;
 };
 
 export const toolLabels: Record<ToolType, { label: string; short: string; color: string }> = {
@@ -74,10 +69,10 @@ export const toolLabels: Record<ToolType, { label: string; short: string; color:
 };
 
 export const mockSessions: ChatSession[] = [
-  { id: "s1", title: "Timing closure block_ctrl", timestamp: "2m", runArea: "/proj/astera/runs/block_ctrl/r42", activeTool: "fc", messageCount: 12 },
-  { id: "s2", title: "DRC violations top_chip", timestamp: "1h", runArea: "/proj/astera/runs/top_chip/r18", messageCount: 8 },
+  { id: "s1", title: "Timing closure block_ctrl", timestamp: "2m", messageCount: 12, pinned: true },
+  { id: "s2", title: "DRC violations top_chip", timestamp: "1h", messageCount: 8 },
   { id: "s3", title: "FC command syntax", timestamp: "3h", messageCount: 4 },
-  { id: "s4", title: "Power analysis pmu_block", timestamp: "1d", activeTool: "redhawk", messageCount: 22 },
+  { id: "s4", title: "Power analysis pmu_block", timestamp: "1d", messageCount: 22 },
   { id: "s5", title: "Clock tree optimization", timestamp: "1d", messageCount: 6 },
 ];
 
@@ -90,17 +85,17 @@ export const mockToolSessions: ToolSession[] = [
 ];
 
 export const mockMemoryDocs: MemoryDoc[] = [
-  { id: "md1", title: "CTS methodology prefs", type: "methodology", summary: "Prefers useful skew optimization before buffer sizing. Target skew < 50ps.", lastUsed: "2m ago", active: true },
-  { id: "md2", title: "block_ctrl run context", type: "run-context", summary: "Current run r42, post-route opt iteration 3. 3 failing timing paths on clk_core.", lastUsed: "5m ago", active: true },
-  { id: "md3", title: "Report format prefs", type: "user-pref", summary: "Always show slack delta from previous iteration. Prefer table format.", lastUsed: "1h ago", active: true },
-  { id: "md4", title: "Tape-out constraints", type: "project", summary: "Tape-out target: July 15. No ECOs after July 1. Block-level freeze June 20.", lastUsed: "3h ago", active: false },
+  { id: "md1", title: "CTS methodology prefs", type: "methodology", summary: "Prefers useful skew optimization before buffer sizing. Target skew < 50ps.", lastUsed: "2m ago" },
+  { id: "md2", title: "block_ctrl run context", type: "run-context", summary: "Current run r42, post-route opt iteration 3. 3 failing timing paths on clk_core.", lastUsed: "5m ago" },
+  { id: "md3", title: "Report format prefs", type: "user-pref", summary: "Always show slack delta from previous iteration. Prefer table format.", lastUsed: "1h ago" },
+  { id: "md4", title: "Tape-out constraints", type: "project", summary: "Tape-out target: July 15. No ECOs after July 1. Block-level freeze June 20.", lastUsed: "3h ago" },
 ];
 
 export const mockToolCalls: ToolCall[] = [
-  { id: "tc1", timestamp: "14:29", tool: "file_read", input: "reports/timing_opt3.rpt", output: "3 failing paths...", duration: "0.4s", route: "log-analysis" },
-  { id: "tc2", timestamp: "14:29", tool: "file_read", input: "reports/timing_opt2.rpt", output: "Baseline comparison...", duration: "0.3s", route: "log-analysis" },
-  { id: "tc3", timestamp: "14:32", tool: "fc_command", input: "report_clock_timing -type skew -clock clk_core", output: "Skew: 0.087 ns", duration: "1.2s", route: "live-fc" },
-  { id: "tc4", timestamp: "14:33", tool: "knowledge_lookup", input: "create_placement_blockage syntax", output: "FC command reference", duration: "0.2s", route: "knowledge" },
+  { id: "tc1", timestamp: "14:29", tool: "file_read", input: "reports/timing_opt3.rpt", output: "3 failing paths identified", duration: "0.4s" },
+  { id: "tc2", timestamp: "14:29", tool: "file_read", input: "reports/timing_opt2.rpt", output: "Baseline comparison loaded", duration: "0.3s" },
+  { id: "tc3", timestamp: "14:32", tool: "fc_command", input: "report_clock_timing -type skew -clock clk_core", output: "Skew: 0.087 ns", duration: "1.2s" },
+  { id: "tc4", timestamp: "14:33", tool: "knowledge_lookup", input: "create_placement_blockage syntax", output: "FC command reference", duration: "0.2s" },
 ];
 
 export const mockMessages: Message[] = [
@@ -117,7 +112,6 @@ export const mockMessages: Message[] = [
 
 **3 failing paths identified**, all through \`clk_core\`. The common factor is route optimization moved clock buffer \`CTS_BUF_12\`, adding ~0.1ns to the clock path.`,
     timestamp: "14:29",
-    route: "log-analysis",
     artifact: {
       id: "a1",
       type: "chart",
@@ -144,7 +138,6 @@ export const mockMessages: Message[] = [
     role: "assistant",
     content: `Clock skew for \`clk_core\` is **0.087 ns** — above your 0.05 ns target.`,
     timestamp: "14:32",
-    route: "live-fc",
     fcCommand: {
       command: "report_clock_timing -type skew -clock clk_core",
       output: `Clock Skew:
@@ -189,7 +182,6 @@ Set bbox around \`CTS_BUF_12\`'s original position from opt2. Use \`-type soft\`
 
 Want me to execute this on the live session?`,
     timestamp: "14:33",
-    route: "knowledge",
     citations: ["FC create_placement_blockage reference"],
   },
 ];
