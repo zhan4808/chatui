@@ -18,7 +18,7 @@ export default function LoginScreen({ onLogin }: { onLogin: (username: string) =
           <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "var(--accent-surface)" }}>
             <Cpu size={18} strokeWidth={2} style={{ color: "var(--accent)" }} />
           </div>
-          <span className="text-lg font-semibold tracking-tight">PDGuru</span>
+          <span className="text-lg font-semibold tracking-tight font-display">PDGuru</span>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -33,7 +33,7 @@ export default function LoginScreen({ onLogin }: { onLogin: (username: string) =
               placeholder="e.g. kkverma"
               autoFocus
               className="w-full px-3.5 py-2.5 rounded-xl text-[13px] outline-none transition-all focus:ring-1 focus:ring-[var(--accent)] placeholder:text-[var(--text-muted)]"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              style={{ background: "var(--surface)" }}
             />
           </div>
 
